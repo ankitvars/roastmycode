@@ -1,4 +1,5 @@
-import { getFlashModel } from './gemini';
+import { generateWithProvider } from './providers';
+import type { Provider } from './providers';
 import { computeScores } from './scorer';
 import type { ReviewResult, Finding, Verdict } from './types';
 import { randomUUID } from 'crypto';
@@ -89,10 +90,20 @@ export function parseReviewResponse(raw: string): ReviewResult {
   return { verdict, roastLine, summary, findings, praise, scores, language, detectedStack };
 }
 
-export async function runAIReview(code: string, language = 'unknown'): Promise<ReviewResult> {
-  const model  = getFlashModel();
+export async function runAIReview(code: string, language = 'unknown', provider: Provider = 'gemini'): Promise<ReviewResult> {
   const prompt = buildReviewPrompt(code, language);
-  const result = await model.generateContent(prompt);
-  const text   = result.response.text();
-  return parseReviewResponse(text);
+
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const text = await generateWithProvider(prompt, provider);
+      return parseReviewResponse(text);
+    } catch (err: unknown) {
+      lastError = err;
+      const is503 = err instanceof Error && (err.message.includes('503') || err.message.includes('high demand'));
+      if (!is503) throw err;
+      await new Promise(r => setTimeout(r, (attempt + 1) * 3000));
+    }
+  }
+  throw lastError;
 }

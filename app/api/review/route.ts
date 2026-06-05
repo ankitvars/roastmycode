@@ -3,16 +3,21 @@ import { z } from 'zod';
 import { runAIReview } from '@/lib/reviewer';
 import { fetchGithubPR, parseGithubPRUrl } from '@/lib/githubPR';
 import { createClient } from '@/lib/supabase/server';
+import type { Provider } from '@/lib/providers';
+
+const PROVIDERS = ['gemini', 'anthropic', 'openai', 'qwen'] as const;
 
 const RequestSchema = z.discriminatedUnion('type', [
   z.object({
     type:     z.literal('code'),
     code:     z.string().min(10, 'Code must be at least 10 characters').max(30000),
     language: z.string().optional().default('unknown'),
+    provider: z.enum(PROVIDERS).optional().default('gemini'),
   }),
   z.object({
-    type: z.literal('github_pr'),
-    url:  z.string().url(),
+    type:     z.literal('github_pr'),
+    url:      z.string().url(),
+    provider: z.enum(PROVIDERS).optional().default('gemini'),
   }),
 ]);
 
@@ -59,7 +64,8 @@ export async function POST(req: NextRequest) {
       language     = parsed.data.language;
     }
 
-    const review = await runAIReview(codeToReview, language);
+    const provider = parsed.data.provider as Provider;
+    const review   = await runAIReview(codeToReview, language, provider);
 
     const { data: record, error: dbError } = await supabase
       .from('reviews')

@@ -67,26 +67,23 @@ export default async function ReviewPermalinkPage({ params }: Props) {
     },
   };
 
-  // Increment view count (fire-and-forget)
   supabase.from('reviews').update({ view_count: record.view_count + 1 }).eq('id', id);
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-10">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          {record.pr_title && (
-            <p className="text-sm text-gray-500">
-              PR: <span className="text-gray-300">{record.pr_title}</span>
-              {record.pr_author && <span className="text-gray-600"> by @{record.pr_author}</span>}
-            </p>
-          )}
-          <p className="text-xs text-gray-600 mt-1">
-            {new Date(record.created_at).toLocaleDateString('en-IN', {
-              day: 'numeric', month: 'short', year: 'numeric',
-            })}
-            {' · '}{record.view_count} views
+      <div className="mb-6">
+        {record.pr_title && (
+          <p className="text-sm text-dim">
+            PR: <span className="text-ink">{record.pr_title}</span>
+            {record.pr_author && <span className="text-ghost"> by @{record.pr_author}</span>}
           </p>
-        </div>
+        )}
+        <p className="text-xs text-ghost mt-1">
+          {new Date(record.created_at).toLocaleDateString('en-IN', {
+            day: 'numeric', month: 'short', year: 'numeric',
+          })}
+          {' · '}{record.view_count} views
+        </p>
       </div>
       <ReviewResult result={result} reviewId={id} />
     </main>

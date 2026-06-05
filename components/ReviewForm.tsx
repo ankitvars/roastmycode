@@ -2,6 +2,8 @@
 
 import { useState, useRef } from 'react';
 import type { ReviewResult } from '@/lib/types';
+import type { Provider } from '@/lib/provider-config';
+import { PROVIDER_LABELS } from '@/lib/provider-config';
 
 interface ReviewFormProps {
   onResult:  (result: ReviewResult, id: string | null) => void;
@@ -21,14 +23,22 @@ const LANGUAGE_OPTIONS = [
   'rust', 'c++', 'c#', 'ruby', 'php', 'unknown',
 ];
 
+const PROVIDER_ICONS: Record<Provider, string> = {
+  gemini:    '✦',
+  anthropic: '◆',
+  openai:    '⬡',
+  qwen:      '❋',
+};
+
 export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
-  const [tab, setTab]       = useState<Tab>('code');
-  const [code, setCode]     = useState('');
-  const [prUrl, setPrUrl]   = useState('');
-  const [language, setLang] = useState('typescript');
-  const [error, setError]   = useState('');
-  const [prMeta, setPrMeta] = useState<{ title: string; author: string } | null>(null);
-  const prDebounce          = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [tab, setTab]           = useState<Tab>('code');
+  const [code, setCode]         = useState('');
+  const [prUrl, setPrUrl]       = useState('');
+  const [language, setLang]     = useState('typescript');
+  const [provider, setProvider] = useState<Provider>('gemini');
+  const [error, setError]       = useState('');
+  const [prMeta, setPrMeta]     = useState<{ title: string; author: string } | null>(null);
+  const prDebounce              = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handlePrUrlChange = (url: string) => {
     setPrUrl(url);
@@ -48,8 +58,8 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
 
     try {
       const body = tab === 'code'
-        ? { type: 'code', code, language }
-        : { type: 'github_pr', url: prUrl };
+        ? { type: 'code', code, language, provider }
+        : { type: 'github_pr', url: prUrl, provider };
 
       const res  = await fetch('/api/review', {
         method:  'POST',
@@ -78,16 +88,19 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
     : prUrl.includes('github.com') && prUrl.includes('/pull/');
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-      <div className="flex border-b border-gray-800">
+    <div className="bg-card border border-line rounded-xl overflow-hidden">
+      {/* Tabs */}
+      <div className="flex border-b border-line" role="tablist">
         {(['code', 'github_pr'] as Tab[]).map(t => (
           <button
             key={t}
+            role="tab"
+            aria-selected={tab === t}
             onClick={() => setTab(t)}
             className={`flex-1 py-3 text-sm font-medium transition-colors ${
               tab === t
-                ? 'bg-gray-800 text-white border-b-2 border-indigo-500'
-                : 'text-gray-500 hover:text-gray-300'
+                ? 'bg-raised text-ink border-b-2 border-fire'
+                : 'text-dim hover:text-ink'
             }`}
           >
             {t === 'code' ? '📋 Paste Code' : '🔗 GitHub PR URL'}
@@ -99,11 +112,12 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
         {tab === 'code' ? (
           <>
             <div className="flex items-center justify-between mb-3">
-              <label className="text-xs text-gray-400 font-medium">Language</label>
+              <label htmlFor="lang-select" className="text-xs text-dim font-medium">Language</label>
               <select
+                id="lang-select"
                 value={language}
                 onChange={e => setLang(e.target.value)}
-                className="bg-gray-800 text-gray-300 text-xs px-2 py-1 rounded border border-gray-700 focus:outline-none"
+                className="bg-raised text-dim text-xs px-2 py-1 rounded border border-line focus:outline-none focus:border-fire"
               >
                 {LANGUAGE_OPTIONS.map(l => (
                   <option key={l} value={l}>{l}</option>
@@ -115,45 +129,75 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
               onChange={e => setCode(e.target.value)}
               placeholder={PLACEHOLDER_CODE}
               rows={14}
-              className="w-full bg-gray-950 text-gray-300 font-mono text-sm p-4 rounded-lg border border-gray-800 focus:outline-none focus:border-indigo-500 resize-none placeholder-gray-700"
+              aria-label="Code to review"
+              className="w-full bg-canvas text-dim font-mono text-sm p-4 rounded-lg border border-line focus:outline-none focus:border-fire resize-none placeholder-ghost"
             />
-            <p className="text-xs text-gray-600 mt-2">{code.length} chars — max 30,000</p>
+            <p className="text-xs text-ghost mt-2" aria-live="polite">
+              {code.length.toLocaleString()} chars — max 30,000
+            </p>
           </>
         ) : (
           <div>
-            <label className="text-xs text-gray-400 font-medium block mb-2">
+            <label htmlFor="pr-url" className="text-xs text-dim font-medium block mb-2">
               GitHub PR URL (public repos only)
             </label>
             <input
+              id="pr-url"
               type="url"
               value={prUrl}
               onChange={e => handlePrUrlChange(e.target.value)}
               placeholder="https://github.com/owner/repo/pull/123"
-              className="w-full bg-gray-950 text-gray-300 text-sm px-4 py-3 rounded-lg border border-gray-800 focus:outline-none focus:border-indigo-500 placeholder-gray-700"
+              className="w-full bg-canvas text-dim text-sm px-4 py-3 rounded-lg border border-line focus:outline-none focus:border-fire placeholder-ghost"
             />
             {prMeta && (
-              <div className="mt-3 bg-gray-800 rounded-lg px-4 py-3">
-                <p className="text-xs text-gray-400">PR found:</p>
-                <p className="text-sm text-white font-medium mt-0.5">{prMeta.title}</p>
-                <p className="text-xs text-gray-500">by @{prMeta.author}</p>
+              <div className="mt-3 bg-raised rounded-lg px-4 py-3 border border-line" aria-live="polite">
+                <p className="text-xs text-dim">PR found:</p>
+                <p className="text-sm text-ink font-medium mt-0.5">{prMeta.title}</p>
+                <p className="text-xs text-ghost">by @{prMeta.author}</p>
               </div>
             )}
-            <p className="text-xs text-gray-600 mt-3">
+            <p className="text-xs text-ghost mt-3">
               Works with any public GitHub repo. Private repos require a GitHub token.
             </p>
           </div>
         )}
 
+        {/* Provider selector */}
+        <fieldset className="mt-4">
+          <legend className="text-xs text-dim font-medium mb-2">AI Provider</legend>
+          <div className="grid grid-cols-2 gap-2">
+            {(Object.keys(PROVIDER_LABELS) as Provider[]).map(p => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setProvider(p)}
+                aria-pressed={provider === p}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
+                  provider === p
+                    ? 'border-fire bg-fire/10 text-fire'
+                    : 'border-line bg-raised text-dim hover:border-trim hover:text-ink'
+                }`}
+              >
+                <span aria-hidden="true">{PROVIDER_ICONS[p]}</span>
+                <span className="truncate">{PROVIDER_LABELS[p]}</span>
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
         {error && (
-          <div className="mt-4 bg-red-950 border border-red-800 rounded-lg px-4 py-3">
-            <p className="text-sm text-red-400">{error}</p>
+          <div
+            role="alert"
+            className="mt-4 bg-reject/10 border border-reject/30 rounded-lg px-4 py-3"
+          >
+            <p className="text-sm text-reject">{error}</p>
           </div>
         )}
 
         <button
           onClick={handleSubmit}
           disabled={!isSubmittable}
-          className="mt-4 w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-600 text-white font-medium py-3 rounded-lg transition-colors text-sm"
+          className="mt-4 w-full bg-fire hover:bg-ember disabled:bg-raised disabled:text-ghost text-white font-medium py-3 rounded-lg transition-colors text-sm font-display"
         >
           🔥 Roast My Code
         </button>

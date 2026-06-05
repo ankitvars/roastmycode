@@ -15,7 +15,7 @@ const VERDICT_COLOR: Record<string, string> = {
 };
 
 export default function ShareCard({ result, reviewId }: ShareCardProps) {
-  const cardRef    = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [copying, setCopying] = useState(false);
 
   const shareUrl = reviewId
@@ -32,60 +32,58 @@ export default function ShareCard({ result, reviewId }: ShareCardProps) {
     setTimeout(() => setCopying(false), 2000);
   };
 
-  const verdictColor = VERDICT_COLOR[result.verdict] ?? '#6366f1';
+  const verdictColor = VERDICT_COLOR[result.verdict] ?? '#f97316';
 
   return (
     <div>
-      {/* Visual card (rendered for screenshotting) */}
+      {/* Visual share card */}
       <div
         ref={cardRef}
-        className="bg-gray-950 border border-gray-800 rounded-2xl p-6 relative overflow-hidden"
-        style={{ fontFamily: 'monospace' }}
+        className="bg-canvas border border-line rounded-2xl p-6 relative overflow-hidden font-mono"
       >
         <div
-          className="absolute top-0 left-0 right-0 h-1"
+          className="absolute top-0 left-0 right-0 h-0.5"
           style={{ background: verdictColor }}
+          aria-hidden="true"
         />
         <div className="flex items-start justify-between mb-4">
           <div>
-            <p className="text-xs text-gray-500 mb-1">🔥 RoastMyCode</p>
-            <p
-              className="text-lg font-black"
-              style={{ color: verdictColor }}
-            >
+            <p className="text-xs text-ghost mb-1">🔥 RoastMyCode</p>
+            <p className="text-lg font-black font-display" style={{ color: verdictColor }}>
               {result.verdict.replace('_', ' ')}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-500">Overall Score</p>
+            <p className="text-xs text-ghost">Overall Score</p>
             <p
-              className="text-4xl font-black tabular-nums"
+              className="text-4xl font-black tabular-nums font-display"
               style={{ color: verdictColor }}
+              aria-label={`Score: ${result.scores.overall} out of 100`}
             >
               {result.scores.overall}
             </p>
           </div>
         </div>
 
-        <p className="text-sm text-gray-300 italic mb-4 leading-relaxed">
+        <p className="text-sm text-dim italic mb-4 leading-relaxed">
           &ldquo;{result.roastLine}&rdquo;
         </p>
 
-        <div className="grid grid-cols-4 gap-2 text-center">
+        <div className="grid grid-cols-4 gap-2 text-center" aria-label="Score breakdown">
           {[
-            { label: '🔒', value: result.scores.security },
-            { label: '⚡', value: result.scores.performance },
-            { label: '♿', value: result.scores.accessibility },
-            { label: '✨', value: result.scores.quality },
-          ].map(({ label, value }) => (
-            <div key={label} className="bg-gray-900 rounded-lg p-2">
-              <div className="text-lg">{label}</div>
-              <div className="text-sm font-bold text-white">{value}</div>
+            { label: 'Security',      icon: '🔒', value: result.scores.security },
+            { label: 'Performance',   icon: '⚡', value: result.scores.performance },
+            { label: 'Accessibility', icon: '♿', value: result.scores.accessibility },
+            { label: 'Quality',       icon: '✨', value: result.scores.quality },
+          ].map(({ label, icon, value }) => (
+            <div key={label} className="bg-card rounded-lg p-2">
+              <div className="text-lg" aria-hidden="true">{icon}</div>
+              <div className="text-sm font-bold text-ink" aria-label={`${label}: ${value}`}>{value}</div>
             </div>
           ))}
         </div>
 
-        <p className="text-xs text-gray-700 mt-4 text-center">roastmycode.vercel.app</p>
+        <p className="text-xs text-ghost mt-4 text-center">roastmycode.vercel.app</p>
       </div>
 
       {/* Share actions */}
@@ -100,7 +98,8 @@ export default function ShareCard({ result, reviewId }: ShareCardProps) {
         </a>
         <button
           onClick={copyLink}
-          className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium py-2.5 rounded-lg transition-colors"
+          className="flex-1 bg-raised hover:bg-overlay text-dim hover:text-ink text-sm font-medium py-2.5 rounded-lg border border-line transition-colors"
+          aria-label={copying ? 'Link copied' : 'Copy share link'}
         >
           {copying ? '✓ Copied!' : 'Copy Link'}
         </button>

@@ -21,8 +21,8 @@ export default function ReviewPage() {
     <main className="max-w-3xl mx-auto px-4 py-10">
       {!result && !loading && (
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-white mb-3">🔥 Get Roasted</h1>
-          <p className="text-gray-400 text-base">
+          <h1 className="text-3xl font-bold font-display text-ink mb-3">🔥 Get Roasted</h1>
+          <p className="text-dim text-base">
             Paste your code or drop a GitHub PR URL.<br />
             A brutally honest AI senior engineer will tear it apart.
           </p>
@@ -30,10 +30,10 @@ export default function ReviewPage() {
       )}
 
       {loading && (
-        <div className="text-center py-20">
-          <div className="text-4xl mb-4 animate-bounce">🔥</div>
-          <p className="text-white font-medium text-lg">Reviewing your code…</p>
-          <p className="text-gray-500 text-sm mt-2">The senior engineer is judging you right now</p>
+        <div className="text-center py-20" role="status" aria-live="polite">
+          <div className="text-4xl mb-4 animate-bounce" aria-hidden="true">🔥</div>
+          <p className="text-ink font-medium text-lg">Reviewing your code…</p>
+          <p className="text-dim text-sm mt-2">The senior engineer is judging you right now</p>
         </div>
       )}
 
@@ -42,7 +42,7 @@ export default function ReviewPage() {
           <ReviewResult result={result} reviewId={reviewId} />
           <button
             onClick={() => { setResult(null); setId(null); }}
-            className="mt-6 w-full border border-gray-700 text-gray-400 hover:text-white py-3 rounded-lg text-sm transition-colors"
+            className="mt-6 w-full border border-line text-dim hover:text-ink hover:border-trim py-3 rounded-lg text-sm transition-colors"
           >
             Review another piece of code
           </button>
