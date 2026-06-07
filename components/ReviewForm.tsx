@@ -88,7 +88,15 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
     : prUrl.includes('github.com') && prUrl.includes('/pull/');
 
   return (
-    <div className="bg-card border border-line rounded-xl overflow-hidden">
+    <div className="border border-line overflow-hidden font-mono">
+      {/* Terminal title bar */}
+      <div className="bg-raised border-b border-line px-4 py-2 flex items-center gap-2" aria-hidden="true">
+        <span className="w-2.5 h-2.5 rounded-full bg-reject/60" />
+        <span className="w-2.5 h-2.5 rounded-full bg-changes/60" />
+        <span className="w-2.5 h-2.5 rounded-full bg-merge/60" />
+        <span className="ml-2 text-xs text-ghost">roastmycode — code-review.sh</span>
+      </div>
+
       {/* Tabs */}
       <div className="flex border-b border-line" role="tablist">
         {(['code', 'github_pr'] as Tab[]).map(t => (
@@ -97,27 +105,30 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
             role="tab"
             aria-selected={tab === t}
             onClick={() => setTab(t)}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${
+            className={`px-5 py-2.5 text-xs font-mono transition-colors ${
               tab === t
-                ? 'bg-raised text-ink border-b-2 border-fire'
-                : 'text-dim hover:text-ink'
+                ? 'bg-canvas text-fire border-b border-fire -mb-px'
+                : 'text-dim hover:text-ink bg-raised'
             }`}
           >
-            {t === 'code' ? '📋 Paste Code' : '🔗 GitHub PR URL'}
+            {t === 'code' ? '[paste code]' : '[github pr]'}
           </button>
         ))}
+        <div className="flex-1 bg-raised" aria-hidden="true" />
       </div>
 
-      <div className="p-5">
+      <div className="p-5 bg-canvas">
         {tab === 'code' ? (
           <>
             <div className="flex items-center justify-between mb-3">
-              <label htmlFor="lang-select" className="text-xs text-dim font-medium">Language</label>
+              <label htmlFor="lang-select" className="text-xs text-dim">
+                <span className="text-fire" aria-hidden="true">--</span>lang
+              </label>
               <select
                 id="lang-select"
                 value={language}
                 onChange={e => setLang(e.target.value)}
-                className="bg-raised text-dim text-xs px-2 py-1 rounded border border-line focus:outline-none focus:border-fire"
+                className="bg-raised text-dim text-xs px-2 py-1 border border-line focus:outline-none focus:border-fire font-mono"
               >
                 {LANGUAGE_OPTIONS.map(l => (
                   <option key={l} value={l}>{l}</option>
@@ -130,16 +141,18 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
               placeholder={PLACEHOLDER_CODE}
               rows={14}
               aria-label="Code to review"
-              className="w-full bg-canvas text-dim font-mono text-sm p-4 rounded-lg border border-line focus:outline-none focus:border-fire resize-none placeholder-ghost"
+              className="w-full bg-raised text-dim font-mono text-xs p-4 border border-line focus:outline-none focus:border-fire resize-none placeholder-ghost leading-relaxed"
             />
             <p className="text-xs text-ghost mt-2" aria-live="polite">
+              <span className="text-fire opacity-60" aria-hidden="true">// </span>
               {code.length.toLocaleString()} chars — max 30,000
             </p>
           </>
         ) : (
           <div>
-            <label htmlFor="pr-url" className="text-xs text-dim font-medium block mb-2">
-              GitHub PR URL (public repos only)
+            <label htmlFor="pr-url" className="text-xs text-dim block mb-2">
+              <span className="text-fire" aria-hidden="true">--</span>url{' '}
+              <span className="text-ghost">(public repos only)</span>
             </label>
             <input
               id="pr-url"
@@ -147,24 +160,27 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
               value={prUrl}
               onChange={e => handlePrUrlChange(e.target.value)}
               placeholder="https://github.com/owner/repo/pull/123"
-              className="w-full bg-canvas text-dim text-sm px-4 py-3 rounded-lg border border-line focus:outline-none focus:border-fire placeholder-ghost"
+              className="w-full bg-raised text-dim text-xs px-4 py-3 border border-line focus:outline-none focus:border-fire placeholder-ghost font-mono"
             />
             {prMeta && (
-              <div className="mt-3 bg-raised rounded-lg px-4 py-3 border border-line" aria-live="polite">
-                <p className="text-xs text-dim">PR found:</p>
+              <div className="mt-3 bg-raised px-4 py-3 border border-line" aria-live="polite">
+                <p className="text-xs text-ghost">pr found:</p>
                 <p className="text-sm text-ink font-medium mt-0.5">{prMeta.title}</p>
-                <p className="text-xs text-ghost">by @{prMeta.author}</p>
+                <p className="text-xs text-ghost">@{prMeta.author}</p>
               </div>
             )}
             <p className="text-xs text-ghost mt-3">
-              Works with any public GitHub repo. Private repos require a GitHub token.
+              <span className="text-fire opacity-60" aria-hidden="true">// </span>
+              works with any public github repo
             </p>
           </div>
         )}
 
         {/* Provider selector */}
-        <fieldset className="mt-4">
-          <legend className="text-xs text-dim font-medium mb-2">AI Provider</legend>
+        <fieldset className="mt-5">
+          <legend className="text-xs text-dim mb-2.5">
+            <span className="text-fire" aria-hidden="true">--</span>provider
+          </legend>
           <div className="grid grid-cols-2 gap-2">
             {(Object.keys(PROVIDER_LABELS) as Provider[]).map(p => (
               <button
@@ -172,7 +188,7 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
                 type="button"
                 onClick={() => setProvider(p)}
                 aria-pressed={provider === p}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
+                className={`flex items-center gap-2 px-3 py-2 border text-xs font-mono transition-colors ${
                   provider === p
                     ? 'border-fire bg-fire/10 text-fire'
                     : 'border-line bg-raised text-dim hover:border-trim hover:text-ink'
@@ -180,6 +196,7 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
               >
                 <span aria-hidden="true">{PROVIDER_ICONS[p]}</span>
                 <span className="truncate">{PROVIDER_LABELS[p]}</span>
+                {provider === p && <span className="ml-auto text-fire/60" aria-hidden="true">✓</span>}
               </button>
             ))}
           </div>
@@ -188,18 +205,23 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
         {error && (
           <div
             role="alert"
-            className="mt-4 bg-reject/10 border border-reject/30 rounded-lg px-4 py-3"
+            className="mt-4 bg-reject/10 border border-reject/30 px-4 py-3"
           >
-            <p className="text-sm text-reject">{error}</p>
+            <p className="text-xs text-reject">
+              <span className="opacity-60" aria-hidden="true">[error] </span>{error}
+            </p>
           </div>
         )}
 
         <button
           onClick={handleSubmit}
           disabled={!isSubmittable}
-          className="mt-4 w-full bg-fire hover:bg-ember disabled:bg-raised disabled:text-ghost text-white font-medium py-3 rounded-lg transition-colors text-sm font-display"
+          className="mt-4 w-full bg-fire hover:bg-ember disabled:bg-raised disabled:text-ghost text-white font-mono py-3 transition-colors text-sm disabled:cursor-not-allowed"
         >
-          🔥 Roast My Code
+          {isSubmittable
+            ? <><span className="opacity-70 mr-2" aria-hidden="true">$</span>roast my code</>
+            : <span className="opacity-50">$ roast my code</span>
+          }
         </button>
       </div>
     </div>

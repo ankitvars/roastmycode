@@ -70,15 +70,15 @@ export default async function ReviewPermalinkPage({ params }: Props) {
   supabase.from('reviews').update({ view_count: record.view_count + 1 }).eq('id', id);
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-10">
-      <div className="mb-6">
+    <main className="max-w-3xl mx-auto px-4 py-10 font-mono">
+      <div className="mb-6 text-xs text-dim">
         {record.pr_title && (
-          <p className="text-sm text-dim">
-            PR: <span className="text-ink">{record.pr_title}</span>
+          <p>
+            pr: <span className="text-ink">{record.pr_title}</span>
             {record.pr_author && <span className="text-ghost"> by @{record.pr_author}</span>}
           </p>
         )}
-        <p className="text-xs text-ghost mt-1">
+        <p className="mt-1">
           {new Date(record.created_at).toLocaleDateString('en-IN', {
             day: 'numeric', month: 'short', year: 'numeric',
           })}

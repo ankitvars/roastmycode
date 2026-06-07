@@ -7,9 +7,9 @@ const EXAMPLES = [
 ];
 
 const VERDICT_STYLE: Record<string, string> = {
-  REJECT:          'bg-reject/10 text-reject border-reject/30',
-  REQUEST_CHANGES: 'bg-changes/10 text-changes border-changes/30',
-  MERGE:           'bg-merge/10 text-merge border-merge/30',
+  REJECT:          'text-reject border-reject/50',
+  REQUEST_CHANGES: 'text-changes border-changes/50',
+  MERGE:           'text-merge border-merge/50',
 };
 
 const SCORE_COLOR: Record<string, string> = {
@@ -21,56 +21,68 @@ const SCORE_COLOR: Record<string, string> = {
 export default function HomePage() {
   return (
     <main>
-      {/* Hero */}
-      <section className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <div className="inline-flex items-center gap-2 bg-card border border-line rounded-full px-4 py-1.5 text-xs text-dim mb-8">
-          <span className="w-1.5 h-1.5 rounded-full bg-merge animate-pulse" aria-hidden="true" />
-          Free — no credit card — 15 reviews/min
+      {/* Hero — terminal session */}
+      <section className="max-w-4xl mx-auto px-4 pt-16 pb-20">
+        <div className="font-mono text-xs space-y-1 mb-10 text-ghost" aria-hidden="true">
+          <p><span className="text-fire">$</span> roastmycode <span className="text-dim">--version</span></p>
+          <p className="pl-4 text-dim">v2.0.0-brutal — AI senior engineer code review</p>
+          <p><span className="text-fire">$</span> roastmycode <span className="text-dim">--help</span></p>
+          <p className="pl-4 text-dim">Usage: roastmycode [code|pr-url] [--provider=&lt;model&gt;]</p>
+          <p className="pl-4 text-dim">Get your code torn apart. Security, perf, arch. No filters.</p>
         </div>
 
-        <h1 className="text-5xl sm:text-6xl font-black font-display text-ink leading-tight mb-6">
-          Get your code<br />
-          <span className="text-transparent bg-clip-text bg-linear-to-r from-fire to-ember">
-            brutally roasted
-          </span>
+        <h1 className="text-5xl sm:text-6xl font-black font-mono text-ink leading-[1.1] mb-6">
+          get your code<br />
+          <span className="text-fire">brutally roasted.</span>
         </h1>
 
-        <p className="text-dim text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-          Paste your code or drop a GitHub PR URL. An AI senior engineer with zero patience
-          for bad code will tear it apart — security, performance, accessibility, architecture.
-          No sugar-coating. No empty praise. Just the truth.
+        <p className="font-mono text-dim text-sm max-w-2xl mb-10 leading-relaxed border-l-2 border-line pl-4">
+          <span className="text-ghost" aria-hidden="true">// </span>paste code or github pr url<br />
+          <span className="text-ghost" aria-hidden="true">// </span>ai senior engineer tears it apart<br />
+          <span className="text-ghost" aria-hidden="true">// </span>security · performance · architecture<br />
+          <span className="text-ghost" aria-hidden="true">// </span>no sugar-coating — just the truth
         </p>
 
-        <Link
-          href="/review"
-          className="inline-flex items-center gap-2 bg-fire hover:bg-ember text-white font-semibold text-lg px-8 py-4 rounded-xl transition-colors"
-        >
-          🔥 Roast My Code
-          <span className="text-white/70 text-sm font-normal">— it&apos;s free</span>
-        </Link>
+        <div className="flex flex-wrap items-center gap-4">
+          <Link
+            href="/review"
+            className="inline-flex items-center gap-2 bg-fire hover:bg-ember text-white font-mono text-sm px-6 py-3 transition-colors"
+          >
+            <span aria-hidden="true" className="opacity-60">$</span> roast my code
+          </Link>
+          <span className="font-mono text-dim text-xs">
+            free · no credit card · 15 reviews/min
+          </span>
+        </div>
 
-        <p className="mt-4 text-ghost text-sm">
-          Works with TypeScript, Python, Go, Java, Rust and more
+        <p className="mt-4 font-mono text-dim text-xs">
+          <span aria-hidden="true" className="opacity-60">/* </span>
+          typescript · python · go · java · rust · and more
+          <span aria-hidden="true" className="opacity-60"> */</span>
         </p>
       </section>
 
-      {/* Example cards */}
+      {/* Example output */}
       <section className="max-w-4xl mx-auto px-4 pb-20" aria-label="Example reviews">
-        <h2 className="text-center text-xs font-semibold font-display text-ghost uppercase tracking-widest mb-8">
-          Real reviews — no filters
+        <h2 className="font-mono text-xs text-dim mb-4 flex items-center gap-2">
+          <span className="text-fire" aria-hidden="true">$</span>
+          example reviews
         </h2>
-        <div className="grid sm:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-3 gap-3">
           {EXAMPLES.map((ex, i) => (
-            <div key={i} className="bg-card border border-line rounded-xl p-5">
+            <div key={i} className="bg-card border border-line p-4 font-mono">
               <div className="flex items-center justify-between mb-3">
-                <span className={`text-xs font-bold font-display px-2 py-1 rounded border ${VERDICT_STYLE[ex.verdict]}`}>
+                <span className={`text-xs font-bold border px-2 py-0.5 ${VERDICT_STYLE[ex.verdict]}`}>
                   {ex.verdict.replace('_', ' ')}
                 </span>
-                <span className={`text-2xl font-black font-display ${SCORE_COLOR[ex.verdict]}`}>
+                <span
+                  className={`text-2xl font-black tabular-nums ${SCORE_COLOR[ex.verdict]}`}
+                  aria-label={`Score: ${ex.score}`}
+                >
                   {ex.score}
                 </span>
               </div>
-              <p className="text-sm text-dim italic leading-relaxed">&ldquo;{ex.roast}&rdquo;</p>
+              <p className="text-xs text-dim leading-relaxed">&ldquo;{ex.roast}&rdquo;</p>
             </div>
           ))}
         </div>
@@ -79,19 +91,20 @@ export default function HomePage() {
       {/* How it works */}
       <section className="border-t border-line py-20" aria-label="How it works">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold font-display text-ink text-center mb-12">How it works</h2>
+          <h2 className="font-mono text-xs text-dim mb-10 flex items-center gap-2">
+            <span className="text-fire" aria-hidden="true">$</span>
+            how it works
+          </h2>
           <div className="grid sm:grid-cols-3 gap-8">
             {[
-              { icon: '📋', title: 'Paste code or PR URL', desc: 'Drop any code snippet or link to a public GitHub PR.' },
-              { icon: '🤖', title: 'AI reviews it',        desc: 'Your chosen AI model analyzes security, performance, accessibility, and architecture.' },
-              { icon: '🔥', title: 'Get roasted + share',  desc: 'Receive a brutal scorecard. Share the verdict on Twitter to flex (or suffer).' },
-            ].map(({ icon, title, desc }) => (
-              <div key={title} className="text-center">
-                <div className="w-12 h-12 rounded-full bg-card border border-line flex items-center justify-center text-xl mx-auto mb-4" aria-hidden="true">
-                  {icon}
-                </div>
-                <h3 className="font-semibold font-display text-ink mb-2">{title}</h3>
-                <p className="text-sm text-dim leading-relaxed">{desc}</p>
+              { step: '01', title: 'paste code or pr url', desc: 'Drop any code snippet or link to a public GitHub PR.' },
+              { step: '02', title: 'ai reviews it',        desc: 'Your chosen model analyzes security, performance, accessibility, and architecture.' },
+              { step: '03', title: 'get roasted + share',  desc: 'Receive a brutal scorecard. Share the verdict to flex (or suffer).' },
+            ].map(({ step, title, desc }) => (
+              <div key={step} className="font-mono">
+                <div className="text-fire text-sm font-bold mb-2" aria-hidden="true">[{step}]</div>
+                <h3 className="font-semibold text-ink text-sm mb-2">{title}</h3>
+                <p className="text-xs text-dim leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>

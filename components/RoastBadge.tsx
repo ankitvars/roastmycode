@@ -3,31 +3,31 @@ import type { Verdict } from '@/lib/types';
 const VERDICT_CONFIG: Record<Verdict, {
   label:  string;
   style:  string;
-  icon:   string;
+  prefix: string;
 }> = {
   MERGE: {
-    label: 'LGTM — MERGE',
-    style: 'bg-merge/10 border-merge/30 text-merge',
-    icon:  '✅',
+    label:  'LGTM — MERGE',
+    style:  'border-merge/40 text-merge bg-merge/8',
+    prefix: '✓',
   },
   REQUEST_CHANGES: {
-    label: 'REQUEST CHANGES',
-    style: 'bg-changes/10 border-changes/30 text-changes',
-    icon:  '🔄',
+    label:  'REQUEST CHANGES',
+    style:  'border-changes/40 text-changes bg-changes/8',
+    prefix: '!',
   },
   REJECT: {
-    label: 'REJECT',
-    style: 'bg-reject/10 border-reject/30 text-reject',
-    icon:  '❌',
+    label:  'REJECT',
+    style:  'border-reject/40 text-reject bg-reject/8',
+    prefix: '✗',
   },
 };
 
 export default function RoastBadge({ verdict }: { verdict: Verdict }) {
   const cfg = VERDICT_CONFIG[verdict];
   return (
-    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border ${cfg.style}`}>
-      <span aria-hidden="true">{cfg.icon}</span>
-      <span className="font-bold text-sm tracking-widest font-display">{cfg.label}</span>
+    <div className={`inline-flex items-center gap-2.5 px-4 py-2 border font-mono ${cfg.style}`}>
+      <span className="font-bold text-sm" aria-hidden="true">[{cfg.prefix}]</span>
+      <span className="font-bold text-sm tracking-widest">{cfg.label}</span>
     </div>
   );
 }

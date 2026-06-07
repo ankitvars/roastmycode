@@ -1,7 +1,6 @@
-interface ScoreProps {
-  label: string;
-  score: number;
-  icon:  string;
+function blockBar(score: number, width = 20): string {
+  const filled = Math.round((score / 100) * width);
+  return '█'.repeat(filled) + '░'.repeat(width - filled);
 }
 
 function scoreColor(n: number) {
@@ -11,33 +10,28 @@ function scoreColor(n: number) {
   return 'text-reject';
 }
 
-function barColor(n: number) {
-  if (n >= 80) return 'bg-merge';
-  if (n >= 60) return 'bg-changes';
-  if (n >= 40) return 'bg-high';
-  return 'bg-reject';
+interface ScoreRowProps {
+  label: string;
+  abbr:  string;
+  score: number;
 }
 
-function Score({ label, score, icon }: ScoreProps) {
+function ScoreRow({ label, abbr, score }: ScoreRowProps) {
   return (
-    <div className="bg-card border border-line rounded-xl p-4">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-dim font-medium">
-          <span aria-hidden="true">{icon} </span>{label}
-        </span>
-        <span
-          className={`text-xl font-bold tabular-nums font-display ${scoreColor(score)}`}
-          aria-label={`${score} out of 100`}
-        >
-          {score}
-        </span>
-      </div>
-      <div className="w-full bg-raised rounded-full h-1.5" role="progressbar" aria-valuenow={score} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
-        <div
-          className={`h-1.5 rounded-full transition-all duration-700 ${barColor(score)}`}
-          style={{ width: `${score}%` }}
-        />
-      </div>
+    <div className="font-mono flex items-center gap-3 py-2 border-b border-line last:border-0">
+      <span className="text-xs text-dim w-16 shrink-0 uppercase tracking-wider">{abbr}</span>
+      <span
+        className={`text-xs tracking-tighter ${scoreColor(score)}`}
+        aria-hidden="true"
+      >
+        {blockBar(score)}
+      </span>
+      <span
+        className={`text-sm font-bold tabular-nums ml-auto shrink-0 ${scoreColor(score)}`}
+        aria-label={`${label}: ${score} out of 100`}
+      >
+        {score}
+      </span>
     </div>
   );
 }
@@ -54,27 +48,24 @@ interface ScoreCardProps {
 
 export default function ScoreCard({ scores }: ScoreCardProps) {
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs font-semibold text-dim uppercase tracking-widest font-display">
-          Scores
-        </h2>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-ghost">Overall</span>
+    <div className="bg-card border border-line p-5 font-mono">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-line">
+        <span className="text-xs text-dim uppercase tracking-wider">scores</span>
+        <div className="flex items-baseline gap-1.5">
           <span
-            className={`text-2xl font-black tabular-nums font-display ${scoreColor(scores.overall)}`}
+            className={`text-3xl font-black tabular-nums ${scoreColor(scores.overall)}`}
             aria-label={`Overall score: ${scores.overall} out of 100`}
           >
             {scores.overall}
           </span>
-          <span className="text-xs text-ghost">/100</span>
+          <span className="text-xs text-dim">/100</span>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <Score label="Security"      score={scores.security}      icon="🔒" />
-        <Score label="Performance"   score={scores.performance}   icon="⚡" />
-        <Score label="Accessibility" score={scores.accessibility} icon="♿" />
-        <Score label="Quality"       score={scores.quality}       icon="✨" />
+      <div>
+        <ScoreRow label="Security"      abbr="sec"     score={scores.security}      />
+        <ScoreRow label="Performance"   abbr="perf"    score={scores.performance}   />
+        <ScoreRow label="Accessibility" abbr="a11y"    score={scores.accessibility} />
+        <ScoreRow label="Quality"       abbr="quality" score={scores.quality}       />
       </div>
     </div>
   );

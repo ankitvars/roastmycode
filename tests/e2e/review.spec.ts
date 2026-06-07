@@ -9,8 +9,8 @@ test.describe('Review flow smoke test', () => {
 
   test('review page shows form with tabs', async ({ page }) => {
     await page.goto('/review');
-    await expect(page.getByText('Paste Code')).toBeVisible();
-    await expect(page.getByText('GitHub PR URL')).toBeVisible();
+    await expect(page.getByText(/paste code/i)).toBeVisible();
+    await expect(page.getByText(/github pr/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /roast my code/i })).toBeDisabled();
   });
 
@@ -24,7 +24,7 @@ test.describe('Review flow smoke test', () => {
 
   test('switching to PR tab shows URL input', async ({ page }) => {
     await page.goto('/review');
-    await page.getByText('GitHub PR URL').click();
+    await page.getByText(/github pr/i).click();
     await expect(page.getByPlaceholder(/github.com\/owner\/repo\/pull/i)).toBeVisible();
   });
 });
