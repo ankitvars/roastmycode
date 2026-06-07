@@ -88,9 +88,9 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
     : prUrl.includes('github.com') && prUrl.includes('/pull/');
 
   return (
-    <div className="border border-line overflow-hidden font-mono">
+    <div className="border border-line overflow-hidden">
       {/* Terminal title bar */}
-      <div className="bg-raised border-b border-line px-4 py-2 flex items-center gap-2" aria-hidden="true">
+      <div className="bg-raised border-b border-line px-4 py-2 flex items-center gap-2 font-mono" aria-hidden="true">
         <span className="w-2.5 h-2.5 rounded-full bg-reject/60" />
         <span className="w-2.5 h-2.5 rounded-full bg-changes/60" />
         <span className="w-2.5 h-2.5 rounded-full bg-merge/60" />
@@ -121,7 +121,7 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
         {tab === 'code' ? (
           <>
             <div className="flex items-center justify-between mb-3">
-              <label htmlFor="lang-select" className="text-xs text-dim">
+              <label htmlFor="lang-select" className="text-xs text-dim font-mono">
                 <span className="text-fire" aria-hidden="true">--</span>lang
               </label>
               <select
@@ -143,14 +143,14 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
               aria-label="Code to review"
               className="w-full bg-raised text-dim font-mono text-xs p-4 border border-line focus:outline-none focus:border-fire resize-none placeholder-ghost leading-relaxed"
             />
-            <p className="text-xs text-ghost mt-2" aria-live="polite">
+            <p className="text-xs text-ghost mt-2 font-mono" aria-live="polite">
               <span className="text-fire opacity-60" aria-hidden="true">// </span>
               {code.length.toLocaleString()} chars — max 30,000
             </p>
           </>
         ) : (
           <div>
-            <label htmlFor="pr-url" className="text-xs text-dim block mb-2">
+            <label htmlFor="pr-url" className="text-xs text-dim block mb-2 font-mono">
               <span className="text-fire" aria-hidden="true">--</span>url{' '}
               <span className="text-ghost">(public repos only)</span>
             </label>
@@ -164,12 +164,12 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
             />
             {prMeta && (
               <div className="mt-3 bg-raised px-4 py-3 border border-line" aria-live="polite">
-                <p className="text-xs text-ghost">pr found:</p>
+                <p className="text-xs text-ghost font-mono">pr found:</p>
                 <p className="text-sm text-ink font-medium mt-0.5">{prMeta.title}</p>
-                <p className="text-xs text-ghost">@{prMeta.author}</p>
+                <p className="text-xs text-dim font-mono">@{prMeta.author}</p>
               </div>
             )}
-            <p className="text-xs text-ghost mt-3">
+            <p className="text-xs text-ghost mt-3 font-mono">
               <span className="text-fire opacity-60" aria-hidden="true">// </span>
               works with any public github repo
             </p>
@@ -177,37 +177,38 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
         )}
 
         {/* Provider selector */}
-        <fieldset className="mt-5">
-          <legend className="text-xs text-dim mb-2.5">
+        <div className="mt-5">
+          <label htmlFor="provider-select" className="block text-xs text-dim mb-2 font-mono">
             <span className="text-fire" aria-hidden="true">--</span>provider
-          </legend>
-          <div className="grid grid-cols-2 gap-2">
-            {(Object.keys(PROVIDER_LABELS) as Provider[]).map(p => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setProvider(p)}
-                aria-pressed={provider === p}
-                className={`flex items-center gap-2 px-3 py-2 border text-xs font-mono transition-colors ${
-                  provider === p
-                    ? 'border-fire bg-fire/10 text-fire'
-                    : 'border-line bg-raised text-dim hover:border-trim hover:text-ink'
-                }`}
-              >
-                <span aria-hidden="true">{PROVIDER_ICONS[p]}</span>
-                <span className="truncate">{PROVIDER_LABELS[p]}</span>
-                {provider === p && <span className="ml-auto text-fire/60" aria-hidden="true">✓</span>}
-              </button>
-            ))}
+          </label>
+          <div className="relative">
+            <select
+              id="provider-select"
+              value={provider}
+              onChange={e => setProvider(e.target.value as Provider)}
+              className="w-full appearance-none bg-raised text-ink text-sm px-4 py-2.5 pr-8 border border-line hover:border-trim focus:outline-none focus:border-fire font-mono cursor-pointer transition-colors"
+            >
+              {(Object.keys(PROVIDER_LABELS) as Provider[]).map(p => (
+                <option key={p} value={p}>
+                  {PROVIDER_ICONS[p]}  {PROVIDER_LABELS[p]}
+                </option>
+              ))}
+            </select>
+            <span
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-dim pointer-events-none font-mono text-xs"
+              aria-hidden="true"
+            >
+              ▾
+            </span>
           </div>
-        </fieldset>
+        </div>
 
         {error && (
           <div
             role="alert"
             className="mt-4 bg-reject/10 border border-reject/30 px-4 py-3"
           >
-            <p className="text-xs text-reject">
+            <p className="text-xs text-reject font-mono">
               <span className="opacity-60" aria-hidden="true">[error] </span>{error}
             </p>
           </div>
@@ -216,7 +217,7 @@ export default function ReviewForm({ onResult, onLoading }: ReviewFormProps) {
         <button
           onClick={handleSubmit}
           disabled={!isSubmittable}
-          className="mt-4 w-full bg-fire hover:bg-ember disabled:bg-raised disabled:text-ghost text-white font-mono py-3 transition-colors text-sm disabled:cursor-not-allowed"
+          className="mt-4 w-full bg-fire hover:bg-ember disabled:bg-raised disabled:text-ghost text-white py-3 transition-colors text-sm disabled:cursor-not-allowed font-mono"
         >
           {isSubmittable
             ? <><span className="opacity-70 mr-2" aria-hidden="true">$</span>roast my code</>

@@ -70,13 +70,13 @@ export default function HomePage() {
         </h2>
         <div className="grid sm:grid-cols-3 gap-3">
           {EXAMPLES.map((ex, i) => (
-            <div key={i} className="bg-card border border-line p-4 font-mono">
+            <div key={i} className="bg-card border border-line p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className={`text-xs font-bold border px-2 py-0.5 ${VERDICT_STYLE[ex.verdict]}`}>
                   {ex.verdict.replace('_', ' ')}
                 </span>
                 <span
-                  className={`text-2xl font-black tabular-nums ${SCORE_COLOR[ex.verdict]}`}
+                  className={`text-2xl font-black tabular-nums font-mono ${SCORE_COLOR[ex.verdict]}`}
                   aria-label={`Score: ${ex.score}`}
                 >
                   {ex.score}
@@ -101,8 +101,8 @@ export default function HomePage() {
               { step: '02', title: 'ai reviews it',        desc: 'Your chosen model analyzes security, performance, accessibility, and architecture.' },
               { step: '03', title: 'get roasted + share',  desc: 'Receive a brutal scorecard. Share the verdict to flex (or suffer).' },
             ].map(({ step, title, desc }) => (
-              <div key={step} className="font-mono">
-                <div className="text-fire text-sm font-bold mb-2" aria-hidden="true">[{step}]</div>
+              <div key={step}>
+                <div className="text-fire text-sm font-bold mb-2 font-mono" aria-hidden="true">[{step}]</div>
                 <h3 className="font-semibold text-ink text-sm mb-2">{title}</h3>
                 <p className="text-xs text-dim leading-relaxed">{desc}</p>
               </div>

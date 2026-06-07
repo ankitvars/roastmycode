@@ -19,7 +19,7 @@ export default function ReviewResult({ result, reviewId }: ReviewResultProps) {
   );
 
   return (
-    <div className="space-y-5 font-mono">
+    <div className="space-y-5">
       {/* Verdict + Roast Line */}
       <div className="bg-card border border-line p-6">
         <RoastBadge verdict={result.verdict} />
@@ -44,7 +44,7 @@ export default function ReviewResult({ result, reviewId }: ReviewResultProps) {
       {/* Findings */}
       {sortedFindings.length > 0 && (
         <section aria-label="Findings">
-          <div className="text-xs text-dim uppercase tracking-wider mb-3 flex items-center gap-2">
+          <div className="text-xs text-dim uppercase tracking-wider mb-3 flex items-center gap-2 font-mono">
             <span className="text-fire" aria-hidden="true">▸</span>
             <span>findings ({sortedFindings.length})</span>
             <span className="flex-1 border-t border-line ml-1" aria-hidden="true" />
@@ -60,7 +60,7 @@ export default function ReviewResult({ result, reviewId }: ReviewResultProps) {
       {/* Praise */}
       {result.praise.length > 0 && (
         <section aria-label="What you got right">
-          <div className="text-xs text-merge uppercase tracking-wider mb-3 flex items-center gap-2">
+          <div className="text-xs text-merge uppercase tracking-wider mb-3 flex items-center gap-2 font-mono">
             <span aria-hidden="true">▸</span>
             <span>what you got right</span>
             <span className="flex-1 border-t border-merge/30 ml-1" aria-hidden="true" />
