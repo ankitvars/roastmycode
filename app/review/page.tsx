@@ -20,20 +20,27 @@ export default function ReviewPage() {
   return (
     <main className="max-w-3xl mx-auto px-4 py-10">
       {!result && !loading && (
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold font-display text-ink mb-3">🔥 Get Roasted</h1>
-          <p className="text-dim text-base">
-            Paste your code or drop a GitHub PR URL.<br />
-            A brutally honest AI senior engineer will tear it apart.
+        <div className="mb-8 font-mono">
+          <div className="text-xs text-ghost mb-4 flex items-center gap-2" aria-hidden="true">
+            <span className="text-fire">$</span>
+            <span className="text-dim">roastmycode --interactive</span>
+          </div>
+          <h1 className="text-3xl font-bold text-ink mb-3">get roasted</h1>
+          <p className="text-dim text-sm">
+            paste your code or a github pr url.<br />
+            a brutally honest ai senior engineer will tear it apart.
           </p>
         </div>
       )}
 
       {loading && (
-        <div className="text-center py-20" role="status" aria-live="polite">
-          <div className="text-4xl mb-4 animate-bounce" aria-hidden="true">🔥</div>
-          <p className="text-ink font-medium text-lg">Reviewing your code…</p>
-          <p className="text-dim text-sm mt-2">The senior engineer is judging you right now</p>
+        <div className="py-20 font-mono" role="status" aria-live="polite">
+          <div className="space-y-2 text-sm">
+            <p><span className="text-fire" aria-hidden="true">▸</span> <span className="text-dim">analyzing code structure…</span></p>
+            <p><span className="text-fire" aria-hidden="true">▸</span> <span className="text-dim">checking security vulnerabilities…</span></p>
+            <p><span className="text-fire" aria-hidden="true">▸</span> <span className="text-dim">judging your life choices…</span></p>
+            <p className="text-dim text-xs mt-4 animate-pulse">the senior engineer is reviewing your code</p>
+          </div>
         </div>
       )}
 
@@ -42,9 +49,9 @@ export default function ReviewPage() {
           <ReviewResult result={result} reviewId={reviewId} />
           <button
             onClick={() => { setResult(null); setId(null); }}
-            className="mt-6 w-full border border-line text-dim hover:text-ink hover:border-trim py-3 rounded-lg text-sm transition-colors"
+            className="mt-6 w-full border border-line text-dim hover:text-ink hover:border-trim py-3 text-sm font-mono transition-colors"
           >
-            Review another piece of code
+            <span className="text-fire opacity-60" aria-hidden="true">$ </span>roastmycode --new
           </button>
         </div>
       ) : (

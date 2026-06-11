@@ -3,20 +3,20 @@
 import type { Finding } from '@/lib/types';
 import { useState } from 'react';
 
-const SEVERITY_STYLE: Record<string, string> = {
-  critical: 'bg-critical/10 text-critical border-critical/30',
-  high:     'bg-high/10 text-high border-high/30',
-  medium:   'bg-medium/10 text-medium border-medium/30',
-  low:      'bg-low/10 text-low border-low/30',
-  nitpick:  'bg-nitpick/10 text-nitpick border-nitpick/30',
+const SEVERITY_STYLE: Record<string, { badge: string; abbr: string }> = {
+  critical: { badge: 'text-critical border-critical/40', abbr: 'CRIT' },
+  high:     { badge: 'text-high border-high/40',         abbr: 'HIGH' },
+  medium:   { badge: 'text-medium border-medium/40',     abbr: 'MED'  },
+  low:      { badge: 'text-low border-low/40',           abbr: 'LOW'  },
+  nitpick:  { badge: 'text-nitpick border-nitpick/40',   abbr: 'NIT'  },
 };
 
-const CATEGORY_ICON: Record<string, string> = {
-  security:      '🔒',
-  performance:   '⚡',
-  accessibility: '♿',
-  quality:       '✨',
-  architecture:  '🏗️',
+const CATEGORY_ABBR: Record<string, string> = {
+  security:      'sec',
+  performance:   'perf',
+  accessibility: 'a11y',
+  quality:       'qual',
+  architecture:  'arch',
 };
 
 export default function FindingRow({ finding }: { finding: Finding }) {
@@ -24,41 +24,39 @@ export default function FindingRow({ finding }: { finding: Finding }) {
   const style = SEVERITY_STYLE[finding.severity] ?? SEVERITY_STYLE.low;
 
   return (
-    <div className="border border-line rounded-lg overflow-hidden">
+    <div className="border border-line overflow-hidden font-mono">
       <button
         onClick={() => setOpen(o => !o)}
         aria-expanded={open}
-        className="w-full flex items-start gap-3 p-4 text-left hover:bg-raised transition-colors"
+        className="w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-raised transition-colors"
       >
-        <span className="mt-0.5 text-base" aria-hidden="true">
-          {CATEGORY_ICON[finding.category] ?? '•'}
+        <span className={`text-xs font-bold border px-1.5 py-0.5 shrink-0 mt-0.5 tabular-nums ${style.badge}`}>
+          {style.abbr}
         </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${style}`}>
-              {finding.severity.toUpperCase()}
-            </span>
+            <span className="text-xs text-ghost uppercase">{CATEGORY_ABBR[finding.category] ?? finding.category}</span>
             {finding.lineRef && (
-              <span className="text-xs text-ghost font-mono">{finding.lineRef}</span>
+              <span className="text-xs text-fire">{finding.lineRef}</span>
             )}
           </div>
-          <p className="text-sm text-ink font-medium mt-1">{finding.title}</p>
+          <p className="text-sm text-ink mt-0.5">{finding.title}</p>
         </div>
-        <span className="text-ghost text-xs mt-1" aria-hidden="true">{open ? '▲' : '▼'}</span>
+        <span className="text-ghost text-xs mt-1 shrink-0" aria-hidden="true">{open ? '[-]' : '[+]'}</span>
       </button>
 
       {open && (
-        <div className="border-t border-line px-4 pb-4 pt-3 space-y-3">
-          <p className="text-sm text-dim">{finding.description}</p>
+        <div className="border-t border-line px-4 pb-4 pt-3 space-y-3 bg-raised">
+          <p className="text-sm text-dim leading-relaxed">{finding.description}</p>
 
           {finding.codeSnippet && (
-            <pre className="bg-canvas rounded p-3 text-xs font-mono text-dim overflow-x-auto border border-line">
+            <pre className="bg-canvas p-3 text-xs font-mono text-dim overflow-x-auto border border-line leading-relaxed">
               {finding.codeSnippet}
             </pre>
           )}
 
-          <div className="bg-fire/5 border border-fire/20 rounded p-3">
-            <p className="text-xs font-semibold text-fire mb-1">Suggestion</p>
+          <div className="bg-fire/5 border border-fire/20 p-3">
+            <p className="text-xs font-semibold text-fire mb-1">// suggestion</p>
             <p className="text-sm text-ink">{finding.suggestion}</p>
           </div>
         </div>
